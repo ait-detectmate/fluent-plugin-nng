@@ -22,7 +22,7 @@ module Fluent::Plugin
 
     def configure(conf)
       compat_parameters_convert(conf, :formatter, :inject)
-      if @uri !~ /\A#{URI::regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
+      if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
         raise Fluent::ConfigError, 'uri must be one of: tcp:// ipc:// inproc:// ws:// or tls+tcp://'
       end
 

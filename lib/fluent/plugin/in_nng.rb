@@ -26,7 +26,7 @@ module Fluent
       config_param :uri, :string, default: 'tcp://127.0.0.1:5555'
 
       def configure(conf)
-        if @uri !~ /\A#{URI::regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
+        if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
           raise Fluent::ConfigError, 'uri must be one of: tcp:// ipc:// inproc:// ws:// or tls+tcp://'
         end
 

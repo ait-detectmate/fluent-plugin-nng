@@ -1,43 +1,85 @@
 # fluent-plugin-nng
 
-[Fluentd](https://fluentd.org/) input plugin to do something.
+[Fluentd](https://fluentd.org/) input and output plugin for [Nano Msg](https://nanomsg.org/).
 
-TODO: write description for you plugin.
+This gem also ships a formatter plugin for [DetectMate](https://github.com/ait-detectmate/DetectMateService).
 
 ## Installation
 
-### RubyGems
+You can install this gem using the following command:
 
 ```
-$ gem install fluent-plugin-nng
-```
-
-### Bundler
-
-Add following line to your Gemfile:
-
-```ruby
-gem "fluent-plugin-nng"
-```
-
-And then execute:
-
-```
-$ bundle
+$ fluent-gem install fluent-plugin-nng
 ```
 
 ## Configuration
 
-You can generate configuration template:
+### Example for input plugin
+
+This example creates a listening nanomsg socket, reads data from it and
+parses the data using the fluentd-plugin [fluent-plugin-parser-protobuf](https://github.com/fluent-plugins-nursery/fluent-plugin-parser-protobuf):
 
 ```
-$ fluent-plugin-config-format input nng
+<source>
+  @type nng
+  @id input_nng
+  <parse>
+    @type protobuf
+    class_file /opt/schemas_pb.rb
+    class_name LogSchema
+    protobuf_version protobuf3
+  </parse>
+  uri tcp://127.0.0.1:5557
+  tag nng.*
+</source>
+
+<match nng.**>
+  @type stdout
+</match>
 ```
 
-You can copy and paste generated documents here.
+### Example for output and formatter plugin
+
+This example reads logs from a file(`/var/log/some.log`) and sends
+the data to a nano msg socket. It automatically formats the data
+using the detectmate `LogSchema` using [fluent-plugin-detectmate](https://github.com/ait-detectmate/fluent-plugin-detectmate). 
+
+```
+<source>
+  @type tail
+  @id input_tail
+  <parse>
+    @type none
+  </parse>
+  path /var/log/some.log
+  path_key logSource
+
+  tag nng.*
+</source>
+
+<match nng.**>
+  @type nng
+  uri tcp://127.0.0.1:5557
+  <inject>
+    hostname_key hostname
+    # overwrite hostname:
+    # hostname somehost
+  </inject>
+  <buffer>
+    flush_mode immediate
+  </buffer>
+  <format>
+    @type detectmate
+  </format>
+</match>
+```
+
+## Limitations
+
+Currently only PAIR communication for nng is supported.
 
 ## Copyright
 
-* Copyright(c) 2025- whotwagner
+* Copyright(c) 2026- whotwagner
 * License
-  * Apache License, Version 2.0
+  * EUROPEAN UNION PUBLIC LICENCE, Version 1.2
