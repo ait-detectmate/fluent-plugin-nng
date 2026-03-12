@@ -2,8 +2,6 @@
 
 [Fluentd](https://fluentd.org/) input and output plugin for [Nano Msg](https://nanomsg.org/).
 
-This gem also ships a formatter plugin for [DetectMate](https://github.com/ait-detectmate/DetectMateService).
-
 ## Installation
 
 You can install this gem using the following command:
