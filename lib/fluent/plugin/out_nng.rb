@@ -9,7 +9,7 @@ module Fluent::Plugin
     helpers :formatter, :inject, :compat_parameters
 
     config_param :uri, :string, default: 'tcp://127.0.0.1:5559'
-    config_param :max_retry, :integer, default: 5
+    config_param :max_retry, :integer, default: 1000
 
     config_section :format do
       config_set_default :@type, 'json'
