@@ -15,15 +15,18 @@
 
 require 'fluent/plugin/input'
 require 'nng'
+require 'uri'
 
 module Fluent
   module Plugin
     class NngInput < Fluent::Plugin::Input
-      Fluent::Plugin.register_input('nng', self)
+      Fluent::Plugin.register_input('nng_in', self)
 
-      helpers :parser, :compat_parameters
+      helpers :parser, :compat_parameters, :thread
 
       config_param :uri, :string, default: 'tcp://127.0.0.1:5555'
+      config_param :recv_timeout, :float, default: 1.0
+      config_param :tag, :string, default: 'nng.input'
 
       def configure(conf)
         if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
@@ -52,38 +55,34 @@ module Fluent
         if uri.scheme == 'ipc'
           File.exist?(uri.path) && File.delete(uri.path)
         end
-        @socket = NNG::Socket.new(:pair0)
+        @socket = NNG::Socket::Pair0.new
         @socket.listen(@uri)
-        @socket.recv_timeout = 5000
+        @socket.recv_timeout = @recv_timeout
       end
 
       def start
         super
         listen
-        run
+        thread_create(:nng_input_run, &method(:run))
       end
 
       def run
         log.info "start looping.."
         loop do
-          begin
-            msg = nil
-            until msg
-              if @stop
-                return
-              end
-              begin
-                msg = @socket.recv
-              rescue NNG::Error
-                next
-              end
+          msg = nil
+          until msg
+            if @stop
+              return
             end
-            tag = "nng.input"
-            @parser.parse(msg) do |time, record|
-              router.emit(tag, time, record)
+            begin
+              msg = @socket.receive
+            rescue Timeout::Error
+              sleep 0.01
+              next
             end
-          rescue NNG::Error => e
-            log.warn "Error in processing message.", :error_class => e.class, :error => e
+          end
+          @parser.parse(msg) do |time, record|
+            router.emit(@tag, time || Fluent::Engine.now, record)
           end
         end
 

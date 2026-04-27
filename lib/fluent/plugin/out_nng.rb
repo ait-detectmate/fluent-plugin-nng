@@ -4,12 +4,13 @@ require 'nng'
 
 module Fluent::Plugin
   class NngOutput < Fluent::Plugin::Output
-    Fluent::Plugin.register_output('nng', self)
+    Fluent::Plugin.register_output('nng_out', self)
 
     helpers :formatter, :inject, :compat_parameters
 
     config_param :uri, :string, default: 'tcp://127.0.0.1:5559'
-    config_param :max_retry, :integer, default: 1000
+    config_param :max_retry, :integer, default: 100
+    config_param :retry_time, :integer, default: 5
 
     config_section :format do
       config_set_default :@type, 'json'
@@ -18,21 +19,25 @@ module Fluent::Plugin
     def initialize
       super
       @formatter = nil
+      log.info 'Initializing'
     end
 
     def configure(conf)
+      log.info "configuring.."
       compat_parameters_convert(conf, :formatter, :inject)
       if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
         raise Fluent::ConfigError, 'uri must be one of: tcp:// ipc:// inproc:// ws:// or tls+tcp://'
       end
 
       super
+      log.info "Creating formatter"
       @formatter = formatter_create
+      log.info "Formatter loaded"
     end
 
     def start
       super
-      log.info "Starting listener at: #{@uri}"
+      log.info "Initiating connection to: #{@uri}"
       connect
     end
 
@@ -41,17 +46,17 @@ module Fluent::Plugin
     end
 
     def connect
-      @socket = NNG::Socket.new(:pair0)
+      @socket = NNG::Socket::Pair0.new
       try = 0
 
       begin
         @socket.dial(@uri)
-      rescue NNG::Error => e
+      rescue => e
         log.error(e)
         log.info("Retry in 5sec")
-        sleep(5)
+        sleep(@retry_time)
         try += 1
-        if try >= @max_retry
+        if @max_retry > 0 && try >= @max_retry
           raise Fluent::UnrecoverableError, e.message
         end
         retry

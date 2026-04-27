@@ -19,7 +19,7 @@ parses the data using the fluentd-plugin [fluent-plugin-parser-protobuf](https:/
 
 ```
 <source>
-  @type nng
+  @type nng_in
   @id input_nng
   <parse>
     @type protobuf
@@ -28,7 +28,6 @@ parses the data using the fluentd-plugin [fluent-plugin-parser-protobuf](https:/
     protobuf_version protobuf3
   </parse>
   uri tcp://127.0.0.1:5557
-  tag nng.*
 </source>
 
 <match nng.**>
@@ -56,7 +55,7 @@ using the detectmate `LogSchema` using [fluent-plugin-detectmate](https://github
 </source>
 
 <match nng.**>
-  @type nng
+  @type nng_out
   uri tcp://127.0.0.1:5557
   <inject>
     hostname_key hostname

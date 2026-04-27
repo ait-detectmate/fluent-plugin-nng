@@ -2,10 +2,10 @@ lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
-  spec.name    = "fluent-plugin-nng"
-  spec.version = "0.1.1"
-  spec.authors = ["whotwagner"]
-  spec.email   = ["code@feedyourhead.at"]
+  spec.name    = 'fluent-plugin-nng'
+  spec.version = '1.0.0'
+  spec.authors = ['whotwagner']
+  spec.email   = ['code@feedyourhead.at']
 
   spec.summary       = %q{Fluentd input-/output plugin for nanomsg-ng.}
   spec.description   = %q{Fluentd input-/output plugin for nanomsg-ng.}
@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 2.6.9"
-  spec.add_development_dependency "rake", "~> 13.3.1"
-  spec.add_development_dependency "test-unit", "~> 3.6.7"
-  spec.add_runtime_dependency "nng-ruby", "~> 1.0.1"
+  spec.add_development_dependency 'bundler', '~> 2.6.9'
+  spec.add_development_dependency 'rake', '~> 13.3.1'
+  spec.add_development_dependency 'test-unit', '~> 3.6.7'
+  spec.add_runtime_dependency 'nng', '~> 1.0.1'
   spec.add_runtime_dependency "fluentd", [">= 0.14.10", "< 2"]
 end
