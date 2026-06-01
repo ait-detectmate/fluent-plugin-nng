@@ -12,6 +12,34 @@ $ fluent-gem install fluent-plugin-nng
 
 ## Configuration
 
+*nng_in configuration parameters*:
+
+| Parameter      | Description      | Default |
+| -------------- | -------------    | ------- |
+| uri | bind socket | `tcp://127.0.0.1:5555`  |
+| recv_timeout | Timeout for recv() | `1.0` |
+| tag | fluentd tag | `nng.input` |
+| cert | Server certificate (PEM string, OpenSSL::X509::Certificate, or Pathname) | `nil` |
+| key  | Private key (PEM string, OpenSSL::PKey, or Pathname) | `nil` |
+| ca | | CA certificate for client verification (mutual TLS) | `nil` |
+| verify | Require client certificates | `false` |
+| server_name | Expected server CN/SAN | calculated |
+
+*nng_out configuration parameters*:
+
+| Parameter      | Description      | Default |
+| -------------- | -------------    | ------- |
+| uri | connect uri | `tcp://127.0.0.1:5555`  |
+| max_retry | Maximum reconnect | `100` |
+| retry_time | Retry connecting after timeout. In seconds | `5` |
+| cert | Server certificate (PEM string, OpenSSL::X509::Certificate, or Pathname) | `nil` |
+| key  | Private key (PEM string, OpenSSL::PKey, or Pathname) | `nil` |
+| ca | | CA certificate for client verification (mutual TLS) | `nil` |
+| verify | Require client certificates | `false` |
+| server_name | Expected server CN/SAN | calculated |
+| format | Dataformat | `json` |
+
+
 ### Example for input plugin
 
 This example creates a listening nanomsg socket, reads data from it and
