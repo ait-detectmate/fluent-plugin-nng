@@ -1,5 +1,6 @@
 require 'fluent/plugin/output'
 require 'nng'
+require 'uri'
 
 module Fluent::Plugin
   class NngOutput < Fluent::Plugin::Output
@@ -30,11 +31,12 @@ module Fluent::Plugin
     def configure(conf)
       log.debug 'configuring..'
       compat_parameters_convert(conf, :formatter, :inject)
+      super
+
       if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
         raise Fluent::ConfigError, 'uri must be one of: tcp:// ipc:// inproc:// ws:// or tls+tcp://'
       end
 
-      super
       log.info 'Creating formatter'
       @formatter = formatter_create
       log.info 'Formatter loaded'

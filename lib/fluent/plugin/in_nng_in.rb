@@ -35,17 +35,18 @@ module Fluent
       config_param :server_name, :string, default: nil
 
       def configure(conf)
+        compat_parameters_convert(conf, :parser)
+        super
+
         if @uri !~ /\A#{URI::RFC2396_PARSER.make_regexp(['tcp', 'ipc', 'inproc', 'ws', 'tls+tcp'])}\z/
           raise Fluent::ConfigError, 'uri must be one of: tcp:// ipc:// inproc:// ws:// or tls+tcp://'
         end
 
-        compat_parameters_convert(conf, :parser)
         parser_config = conf.elements('parse').first
         unless parser_config
           raise Fluent::ConfigError, '<parse> section is required.'
         end
 
-        super
         log.info "parser: #{parser_config}"
         @parser = parser_create(conf: parser_config)
       end
