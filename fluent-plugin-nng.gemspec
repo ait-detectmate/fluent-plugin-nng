@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name    = 'fluent-plugin-nng'
-  spec.version = '1.0.1'
+  spec.version = '1.0.2'
   spec.authors = ['whotwagner']
   spec.email   = ['code@feedyourhead.at']
 
