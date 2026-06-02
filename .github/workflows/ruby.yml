@@ -34,5 +34,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: Prepare environment
+      run: apt update && apt install -y libnng-dev
     - name: Run tests
       run: bundle exec rake
